@@ -190,7 +190,7 @@ const Auth = ({ mode = 'login' }) => {
                       <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
                         id="phone"
-                        placeholder="+1234567890"
+                        placeholder="+27 12 345 6789"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         className="pl-10"
@@ -198,6 +198,21 @@ const Auth = ({ mode = 'login' }) => {
                       />
                     </div>
                   </div>
+
+                  {/* Location Display */}
+                  {locationDetected && formData.location && (
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center space-x-2 text-sm">
+                        <MapPin className="h-4 w-4 text-green-600" />
+                        <div>
+                          <p className="font-semibold text-green-900">Location Detected</p>
+                          <p className="text-green-700">
+                            {formData.location.city}, {formData.location.country}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
               
@@ -234,31 +249,142 @@ const Auth = ({ mode = 'login' }) => {
               </div>
 
               {mode === 'signup' && (
-                <div className="space-y-2">
-                  <Label>I want to</Label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button
-                      type="button"
-                      variant={formData.role === 'rider' ? 'default' : 'outline'}
-                      onClick={() => setFormData({ ...formData, role: 'rider' })}
-                      className={formData.role === 'rider' ? 'bg-black text-white' : ''}
-                    >
-                      Be a Rider
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={formData.role === 'driver' ? 'default' : 'outline'}
-                      onClick={() => setFormData({ ...formData, role: 'driver' })}
-                      className={formData.role === 'driver' ? 'bg-black text-white' : ''}
-                    >
-                      Be a Driver
-                    </Button>
+                <>
+                  {/* Credit Card Information */}
+                  <div className="space-y-3 pt-2 border-t border-gray-200">
+                    <div className="flex items-center space-x-2">
+                      <CreditCard className="h-5 w-5 text-gray-700" />
+                      <Label className="text-base font-semibold">Card Verification (Required)</Label>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="cardNumber">Card Number</Label>
+                      <Input
+                        id="cardNumber"
+                        placeholder="1234 5678 9012 3456"
+                        value={formData.cardNumber}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\s/g, '');
+                          if (value.length <= 16 && /^\d*$/.test(value)) {
+                            setFormData({ ...formData, cardNumber: value });
+                          }
+                        }}
+                        maxLength={19}
+                        required
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="cardExpiry">Expiry (MM/YY)</Label>
+                        <Input
+                          id="cardExpiry"
+                          placeholder="12/25"
+                          value={formData.cardExpiry}
+                          onChange={(e) => {
+                            let value = e.target.value.replace(/\D/g, '');
+                            if (value.length >= 2) {
+                              value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                            }
+                            setFormData({ ...formData, cardExpiry: value });
+                          }}
+                          maxLength={5}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="cardCVV">CVV</Label>
+                        <Input
+                          id="cardCVV"
+                          placeholder="123"
+                          type="password"
+                          value={formData.cardCVV}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, '');
+                            if (value.length <= 3) {
+                              setFormData({ ...formData, cardCVV: value });
+                            }
+                          }}
+                          maxLength={3}
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
+
+                  {/* ID Verification */}
+                  <div className="space-y-3 pt-2 border-t border-gray-200">
+                    <div className="flex items-center space-x-2">
+                      <Upload className="h-5 w-5 text-gray-700" />
+                      <Label className="text-base font-semibold">ID Verification (Required)</Label>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="idImage">Upload ID Document</Label>
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-gray-400 transition-colors">
+                        <input
+                          type="file"
+                          id="idImage"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          required
+                        />
+                        <label htmlFor="idImage" className="cursor-pointer block text-center">
+                          {idImagePreview ? (
+                            <div className="space-y-2">
+                              <img 
+                                src={idImagePreview} 
+                                alt="ID Preview" 
+                                className="max-h-32 mx-auto rounded-lg"
+                              />
+                              <p className="text-sm text-green-600 font-medium">ID Uploaded Successfully</p>
+                              <p className="text-xs text-gray-500">Click to change</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Upload className="h-8 w-8 text-gray-400 mx-auto" />
+                              <p className="text-sm text-gray-600">Click to upload your ID</p>
+                              <p className="text-xs text-gray-500">Passport, Driver's License, or National ID</p>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>I want to</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        type="button"
+                        variant={formData.role === 'rider' ? 'default' : 'outline'}
+                        onClick={() => setFormData({ ...formData, role: 'rider' })}
+                        className={formData.role === 'rider' ? 'bg-black text-white' : ''}
+                      >
+                        Be a Rider
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={formData.role === 'driver' ? 'default' : 'outline'}
+                        onClick={() => setFormData({ ...formData, role: 'driver' })}
+                        className={formData.role === 'driver' ? 'bg-black text-white' : ''}
+                      >
+                        Be a Driver
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-xs text-blue-900">
+                      <strong>Card-Only Platform:</strong> All payments are processed securely through verified credit cards. Your card will be charged only after ride completion.
+                    </p>
+                  </div>
+                </>
               )}
 
               <Button type="submit" className="w-full bg-black text-white hover:bg-gray-800">
-                {mode === 'login' ? 'Log In' : 'Sign Up'}
+                {mode === 'login' ? 'Log In' : 'Sign Up & Verify'}
               </Button>
             </form>
 
