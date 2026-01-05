@@ -75,6 +75,8 @@ async def signup(user_data: UserCreate):
 
 @router.post("/login")
 async def login(credentials: UserLogin):
+    db = await get_db()
+    
     # Find user
     user = await db.users.find_one({"email": credentials.email})
     if not user:
