@@ -81,6 +81,7 @@ async def get_rides(
 
 @router.get("/{ride_id}", response_model=RideResponse)
 async def get_ride(ride_id: str):
+    db = await get_db()
     ride = await db.rides.find_one({"_id": ride_id})
     if not ride:
         raise HTTPException(status_code=404, detail="Ride not found")
