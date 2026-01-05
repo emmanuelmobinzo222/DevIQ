@@ -44,6 +44,7 @@ async def update_user(
 ):
     from dependencies import get_current_user
     current_user = await get_current_user(authorization)
+    db = await get_db()
     
     # Only allow users to update their own profile
     if current_user["_id"] != user_id:
