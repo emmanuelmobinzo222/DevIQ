@@ -78,8 +78,45 @@ const Auth = ({ mode = 'login' }) => {
     }
   }, [mode, toast]);
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, idImage: file });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setIdImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+      toast({
+        title: 'ID Uploaded',
+        description: 'Your identification document has been uploaded',
+      });
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validate card details for signup
+    if (mode === 'signup') {
+      if (!formData.cardNumber || formData.cardNumber.length < 16) {
+        toast({
+          title: 'Invalid Card',
+          description: 'Please enter a valid credit card number',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      if (!formData.idImage) {
+        toast({
+          title: 'ID Required',
+          description: 'Please upload your identification document',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
     
     // Mock authentication
     const user = {
@@ -91,6 +128,9 @@ const Auth = ({ mode = 'login' }) => {
       rating: 5.0,
       totalRides: 0,
       verified: true,
+      cardVerified: mode === 'signup' ? true : false,
+      idVerified: mode === 'signup' ? true : false,
+      location: formData.location,
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${formData.email}`
     };
     
