@@ -1,11 +1,15 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from models import RideCreate, RideResponse, PassengerInfo
-from dependencies import db, get_current_user, get_current_driver
+from dependencies import get_current_user, get_current_driver
 from datetime import datetime
 from typing import Optional, List
 import uuid
 
 router = APIRouter(prefix="/rides", tags=["rides"])
+
+async def get_db():
+    from server import db
+    return db
 
 @router.get("", response_model=List[RideResponse])
 async def get_rides(
@@ -13,6 +17,7 @@ async def get_rides(
     destination: Optional[str] = Query(None),
     date: Optional[str] = Query(None)
 ):
+    db = await get_db()
     # Build query
     query = {"status": "available", "availableSeats": {"$gt": 0}}
     
