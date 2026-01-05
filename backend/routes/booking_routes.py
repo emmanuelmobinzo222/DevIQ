@@ -1,11 +1,15 @@
 from fastapi import APIRouter, HTTPException, Depends
 from models import BookingCreate, BookingResponse, RideHistory
-from dependencies import db, get_current_user
+from dependencies import get_current_user
 from datetime import datetime
 from typing import List
 import uuid
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
+
+async def get_db():
+    from server import db
+    return db
 
 @router.post("/rides/{ride_id}/book", response_model=BookingResponse)
 async def book_ride(
@@ -15,6 +19,7 @@ async def book_ride(
 ):
     from dependencies import get_current_user
     user = await get_current_user(authorization)
+    db = await get_db()
     
     # Get ride
     ride = await db.rides.find_one({"_id": ride_id})
