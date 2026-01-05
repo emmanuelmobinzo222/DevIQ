@@ -1,14 +1,11 @@
 from fastapi import HTTPException, Header
 from typing import Optional
 from auth import decode_access_token
-from motor.motor_asyncio import AsyncIOMotorDatabase
-import os
-from motor.motor_asyncio import AsyncIOMotorClient
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+async def get_db():
+    """Get database instance from server.py"""
+    from server import db
+    return db
 
 async def get_current_user(authorization: Optional[str] = Header(None)):
     if not authorization:
@@ -29,6 +26,7 @@ async def get_current_user(authorization: Optional[str] = Header(None)):
     if user_id is None:
         raise HTTPException(status_code=401, detail="Invalid token payload")
     
+    db = await get_db()
     user = await db.users.find_one({"_id": user_id})
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
