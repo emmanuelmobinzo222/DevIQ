@@ -1,14 +1,19 @@
 from fastapi import APIRouter, HTTPException, Depends
 from models import UserCreate, UserLogin, UserResponse
 from auth import get_password_hash, verify_password, create_access_token, hash_card_number
-from dependencies import db
 from datetime import datetime
 import uuid
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
+async def get_db():
+    from server import db
+    return db
+
 @router.post("/signup")
 async def signup(user_data: UserCreate):
+    db = await get_db()
+    
     # Check if user already exists
     existing_user = await db.users.find_one({"email": user_data.email})
     if existing_user:
