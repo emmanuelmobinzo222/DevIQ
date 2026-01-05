@@ -95,9 +95,9 @@ const Landing = () => {
               <div className="w-14 h-14 bg-gray-900 rounded-xl flex items-center justify-center mb-6">
                 <Shield className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">Safe & Verified</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">100% Verified & Secure</h3>
               <p className="text-gray-600 leading-relaxed">
-                All drivers and riders are verified. Rate your experience and travel with confidence.
+                Card-only platform with ID verification. All users verified through credit card and photo ID for maximum safety.
               </p>
             </div>
           </div>
