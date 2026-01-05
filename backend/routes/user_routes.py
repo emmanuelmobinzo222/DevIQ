@@ -1,12 +1,17 @@
 from fastapi import APIRouter, HTTPException, Depends
 from models import UserResponse, UserUpdate
-from dependencies import db, get_current_user
+from dependencies import get_current_user
 from datetime import datetime
 
 router = APIRouter(prefix="/users", tags=["users"])
 
+async def get_db():
+    from server import db
+    return db
+
 @router.get("/{user_id}", response_model=UserResponse)
 async def get_user(user_id: str):
+    db = await get_db()
     user = await db.users.find_one({"_id": user_id})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
