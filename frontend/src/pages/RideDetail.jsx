@@ -266,12 +266,17 @@ const RideDetail = () => {
                   disabled={ride.availableSeats === 0}
                 >
                   <DollarSign className="h-5 w-5 mr-2" />
-                  Book Now
+                  Pay with Card
                 </Button>
 
-                <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                  <Shield className="h-4 w-4" />
-                  <span>Secure payment protected</span>
+                <div className="space-y-2 pt-2">
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                    <Shield className="h-4 w-4" />
+                    <span>Secure card payment • Charged after completion</span>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs text-gray-500">Only verified cards accepted</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
