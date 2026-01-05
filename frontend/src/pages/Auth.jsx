@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Car, Mail, Lock, User, Phone } from 'lucide-react';
+import { Car, Mail, Lock, User, Phone, CreditCard, Upload, MapPin } from 'lucide-react';
 import { setCurrentUser } from '../mockData';
 import { useToast } from '../hooks/use-toast';
 
@@ -16,8 +16,67 @@ const Auth = ({ mode = 'login' }) => {
     email: '',
     password: '',
     phone: '',
-    role: 'rider'
+    role: 'rider',
+    cardNumber: '',
+    cardExpiry: '',
+    cardCVV: '',
+    idImage: null,
+    location: null
   });
+  const [idImagePreview, setIdImagePreview] = useState(null);
+  const [locationDetected, setLocationDetected] = useState(false);
+
+  useEffect(() => {
+    // Detect user's location automatically
+    if (mode === 'signup' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          // Reverse geocoding to get location details
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+            .then(res => res.json())
+            .then(data => {
+              const country = data.address?.country || 'Unknown';
+              setFormData(prev => ({
+                ...prev,
+                location: {
+                  lat: latitude,
+                  lng: longitude,
+                  country: country,
+                  city: data.address?.city || data.address?.town || '',
+                  address: data.display_name
+                }
+              }));
+              setLocationDetected(true);
+              toast({
+                title: 'Location Detected',
+                description: `${country}`,
+              });
+            })
+            .catch(() => {
+              setFormData(prev => ({
+                ...prev,
+                location: { lat: latitude, lng: longitude, country: 'South Africa' }
+              }));
+              setLocationDetected(true);
+            });
+        },
+        (error) => {
+          // Default to South Africa if geolocation fails
+          setFormData(prev => ({
+            ...prev,
+            location: { lat: -26.2041, lng: 28.0473, country: 'South Africa', city: 'Johannesburg' }
+          }));
+          setLocationDetected(true);
+          toast({
+            title: 'Location Set',
+            description: 'Defaulted to South Africa',
+          });
+        }
+      );
+    }
+  }, [mode, toast]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
