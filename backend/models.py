@@ -96,13 +96,17 @@ class RideCreate(BaseModel):
     origin: RideLocation
     destination: RideLocation
     departureTime: str
+    rideType: str  # 'school_kids', 'private_1', 'shared_2', 'shared_3', 'shared_4', 'shared_5plus', 'split_cost'
     availableSeats: int
     totalSeats: int
     pricePerSeat: float
+    currency: str  # 'ZAR', 'USD', 'EUR', etc.
     carModel: str
     carPlate: str
     distance: Optional[str] = None
     duration: Optional[str] = None
+    isSchoolRide: bool = False
+    schoolName: Optional[str] = None
 
 class PassengerInfo(BaseModel):
     id: str
