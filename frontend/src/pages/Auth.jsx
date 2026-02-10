@@ -131,10 +131,37 @@ const Auth = ({ mode = 'login' }) => {
         return;
       }
       
+      if (!formData.idNumber) {
+        toast({
+          title: 'ID Number Required',
+          description: 'Please enter your national ID number',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
       if (!formData.idImage) {
         toast({
           title: 'ID Required',
           description: 'Please upload your identification document',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (!formData.selfieWithId) {
+        toast({
+          title: 'Selfie Required',
+          description: 'Please upload a selfie holding your ID',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (formData.role === 'driver' && !formData.bankAccount) {
+        toast({
+          title: 'Bank Account Required',
+          description: 'Drivers must provide bank account details',
           variant: 'destructive',
         });
         return;
@@ -154,6 +181,8 @@ const Auth = ({ mode = 'login' }) => {
       cardVerified: mode === 'signup' ? true : false,
       idVerified: mode === 'signup' ? true : false,
       location: formData.location,
+      bankAccount: formData.bankAccount,
+      children: formData.children,
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${formData.email}`
     };
     
