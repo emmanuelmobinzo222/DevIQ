@@ -7,19 +7,19 @@ const Landing = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Header */}
-      <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
+      <header className="fixed top-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <Car className="h-8 w-8 text-black" />
-            <span className="text-2xl font-bold text-black">RideShare</span>
+            <Car className="h-8 w-8 text-purple-600" />
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">RideShare</span>
           </div>
           <div className="flex items-center space-x-4">
             <Button variant="ghost" onClick={() => navigate('/login')}>
               Log in
             </Button>
-            <Button onClick={() => navigate('/signup')} className="bg-black text-white hover:bg-gray-800">
+            <Button onClick={() => navigate('/signup')} className="bg-purple-600 text-white hover:bg-purple-700">
               Sign up
             </Button>
           </div>
@@ -31,18 +31,18 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
-              <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
                 Travel Together,
-                <span className="block mt-2">Save Together</span>
+                <span className="block mt-2 text-purple-600">Save Together</span>
               </h1>
-              <p className="text-xl text-gray-600 leading-relaxed">
+              <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
                 Join rides heading your way and split the fare. The smart way to travel without breaking the bank.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   size="lg" 
                   onClick={() => navigate('/signup')}
-                  className="bg-black text-white hover:bg-gray-800 text-lg px-8 py-6"
+                  className="bg-purple-600 text-white hover:bg-purple-700 text-lg px-8 py-6"
                 >
                   Get Started
                 </Button>
@@ -50,15 +50,15 @@ const Landing = () => {
                   size="lg" 
                   variant="outline"
                   onClick={() => navigate('/rides')}
-                  className="text-lg px-8 py-6 border-2 border-gray-900 hover:bg-gray-50"
+                  className="text-lg px-8 py-6 border-2 border-purple-600 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950"
                 >
                   Find a Ride
                 </Button>
               </div>
             </div>
             <div className="relative">
-              <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center">
-                <Car className="h-64 w-64 text-gray-800" />
+              <div className="aspect-square bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900 dark:to-purple-800 rounded-3xl flex items-center justify-center">
+                <Car className="h-64 w-64 text-purple-600" />
               </div>
             </div>
           </div>
@@ -66,37 +66,37 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-800">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose RideShare?</h2>
-            <p className="text-xl text-gray-600">Save money, meet people, reduce traffic</p>
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Why Choose RideShare?</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300">Save money, meet people, reduce traffic</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 bg-gray-900 rounded-xl flex items-center justify-center mb-6">
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center mb-6">
                 <DollarSign className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">Split the Fare</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Split the Fare</h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 Share rides with others and split the cost. Save up to 70% on your daily commute.
               </p>
             </div>
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 bg-gray-900 rounded-xl flex items-center justify-center mb-6">
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center mb-6">
                 <Users className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">Join Existing Rides</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Join Existing Rides</h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 Find rides heading your direction. No need to book a whole car just for yourself.
               </p>
             </div>
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 bg-gray-900 rounded-xl flex items-center justify-center mb-6">
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center mb-6">
                 <Shield className="h-7 w-7 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">100% Verified & Secure</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">100% Verified & Secure</h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 Card-only platform with ID verification. All users verified through credit card and photo ID for maximum safety.
               </p>
             </div>
