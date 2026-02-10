@@ -405,24 +405,84 @@ const Auth = ({ mode = 'login' }) => {
                     </div>
                   </div>
 
+                  {/* Selfie with ID Verification */}
+                  <div className="space-y-3 pt-2 border-t border-gray-200">
+                    <div className="flex items-center space-x-2">
+                      <Upload className="h-5 w-5 text-gray-700" />
+                      <Label className="text-base font-semibold">Selfie with ID (Required)</Label>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="selfieWithId">Upload Selfie Holding Your ID</Label>
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-gray-400 transition-colors">
+                        <input
+                          type="file"
+                          id="selfieWithId"
+                          accept="image/*"
+                          onChange={handleSelfieUpload}
+                          className="hidden"
+                          required
+                        />
+                        <label htmlFor="selfieWithId" className="cursor-pointer block text-center">
+                          {selfiePreview ? (
+                            <div className="space-y-2">
+                              <img 
+                                src={selfiePreview} 
+                                alt="Selfie Preview" 
+                                className="max-h-32 mx-auto rounded-lg"
+                              />
+                              <p className="text-sm text-green-600 font-medium">Selfie Uploaded Successfully</p>
+                              <p className="text-xs text-gray-500">Click to change</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Upload className="h-8 w-8 text-gray-400 mx-auto" />
+                              <p className="text-sm text-gray-600">Click to upload selfie with ID</p>
+                              <p className="text-xs text-gray-500">Take a clear photo of yourself holding your ID</p>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="idNumber">National ID Number</Label>
+                      <Input
+                        id="idNumber"
+                        placeholder="Enter your ID number"
+                        value={formData.idNumber}
+                        onChange={(e) => setFormData({ ...formData, idNumber: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <Label>I want to</Label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-2">
                       <Button
                         type="button"
                         variant={formData.role === 'rider' ? 'default' : 'outline'}
                         onClick={() => setFormData({ ...formData, role: 'rider' })}
-                        className={formData.role === 'rider' ? 'bg-black text-white' : ''}
+                        className={formData.role === 'rider' ? 'bg-purple-600 text-white hover:bg-purple-700' : ''}
                       >
-                        Be a Rider
+                        Rider
                       </Button>
                       <Button
                         type="button"
                         variant={formData.role === 'driver' ? 'default' : 'outline'}
                         onClick={() => setFormData({ ...formData, role: 'driver' })}
-                        className={formData.role === 'driver' ? 'bg-black text-white' : ''}
+                        className={formData.role === 'driver' ? 'bg-purple-600 text-white hover:bg-purple-700' : ''}
                       >
-                        Be a Driver
+                        Driver
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={formData.role === 'parent' ? 'default' : 'outline'}
+                        onClick={() => setFormData({ ...formData, role: 'parent' })}
+                        className={formData.role === 'parent' ? 'bg-purple-600 text-white hover:bg-purple-700' : ''}
+                      >
+                        Parent
                       </Button>
                     </div>
                   </div>
