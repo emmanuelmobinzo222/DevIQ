@@ -18,6 +18,7 @@ async def get_rides(
     date: Optional[str] = Query(None)
 ):
     db = await get_db()
+    
     # Build query
     query = {"status": "available", "availableSeats": {"$gt": 0}}
     
@@ -27,28 +28,69 @@ async def get_rides(
     if destination:
         query["destination.address"] = {"$regex": destination, "$options": "i"}
     
-    # Get rides
-    rides_cursor = db.rides.find(query).sort("departureTime", 1)
-    rides = await rides_cursor.to_list(length=100)
+    # Get rides with projection and limit at database level
+    projection = {
+        '_id': 1, 'driverId': 1, 'origin': 1, 'destination': 1, 
+        'departureTime': 1, 'availableSeats': 1, 'totalSeats': 1, 
+        'pricePerSeat': 1, 'carModel': 1, 'carPlate': 1, 'status': 1,
+        'currency': 1, 'distance': 1, 'duration': 1, 'rideType': 1,
+        'splitEnabled': 1, 'isSchoolRide': 1, 'schoolName': 1, 'createdAt': 1
+    }
     
-    # Get driver info and bookings for each ride
+    rides = await db.rides.find(query, projection).sort("departureTime", 1).limit(100).to_list(length=None)
+    
+    if not rides:
+        return []
+    
+    # Batch fetch all drivers
+    driver_ids = list(set(ride["driverId"] for ride in rides))
+    drivers_cursor = db.users.find(
+        {"_id": {"$in": driver_ids}},
+        {"_id": 1, "name": 1, "rating": 1, "avatar": 1}
+    )
+    drivers = await drivers_cursor.to_list(length=None)
+    drivers_dict = {driver["_id"]: driver for driver in drivers}
+    
+    # Batch fetch all bookings for these rides
+    ride_ids = [ride["_id"] for ride in rides]
+    bookings = await db.bookings.find(
+        {"rideId": {"$in": ride_ids}, "status": "confirmed"}
+    ).to_list(length=None)
+    
+    # Group bookings by ride
+    bookings_by_ride = {}
+    for booking in bookings:
+        ride_id = booking["rideId"]
+        if ride_id not in bookings_by_ride:
+            bookings_by_ride[ride_id] = []
+        bookings_by_ride[ride_id].append(booking)
+    
+    # Batch fetch all passengers
+    user_ids = list(set(booking["userId"] for booking in bookings))
+    if user_ids:
+        passengers_cursor = db.users.find(
+            {"_id": {"$in": user_ids}},
+            {"_id": 1, "name": 1, "avatar": 1}
+        )
+        passengers = await passengers_cursor.to_list(length=None)
+        passengers_dict = {passenger["_id"]: passenger for passenger in passengers}
+    else:
+        passengers_dict = {}
+    
+    # Build response
     result = []
     for ride in rides:
-        driver = await db.users.find_one({"_id": ride["driverId"]})
+        driver = drivers_dict.get(ride["driverId"])
         if not driver:
             continue
         
         # Get passengers for this ride
-        bookings = await db.bookings.find({
-            "rideId": ride["_id"],
-            "status": "confirmed"
-        }).to_list(length=100)
-        
-        passengers = []
-        for booking in bookings:
-            passenger = await db.users.find_one({"_id": booking["userId"]})
+        ride_bookings = bookings_by_ride.get(ride["_id"], [])
+        passengers_list = []
+        for booking in ride_bookings:
+            passenger = passengers_dict.get(booking["userId"])
             if passenger:
-                passengers.append(PassengerInfo(
+                passengers_list.append(PassengerInfo(
                     id=passenger["_id"],
                     name=passenger["name"],
                     avatar=passenger["avatar"]
@@ -65,13 +107,13 @@ async def get_rides(
             origin=ride["origin"],
             destination=ride["destination"],
             departureTime=ride["departureTime"],
-            rideType=ride.get("rideType", "shared_3"),
+            rideType=ride.get("rideType", "split_cost"),
             availableSeats=ride["availableSeats"],
             totalSeats=ride["totalSeats"],
             pricePerSeat=ride["pricePerSeat"],
             currency=ride.get("currency", "ZAR"),
             status=ride["status"],
-            passengers=passengers,
+            passengers=passengers_list,
             distance=ride.get("distance", "N/A"),
             duration=ride.get("duration", "N/A"),
             splitEnabled=ride.get("splitEnabled", True),
