@@ -101,6 +101,22 @@ const Auth = ({ mode = 'login' }) => {
     }
   };
 
+  const handleSelfieUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, selfieWithId: file });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelfiePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+      toast({
+        title: 'Selfie Uploaded',
+        description: 'Your selfie with ID has been uploaded',
+      });
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
