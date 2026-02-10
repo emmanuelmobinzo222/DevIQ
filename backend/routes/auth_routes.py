@@ -114,7 +114,7 @@ async def login(credentials: UserLogin):
     }
 
 @router.get("/me")
-async def get_me(current_user = Depends(lambda authorization: __import__('dependencies').get_current_user(authorization))):
+async def get_me(current_user = Depends(get_current_user)):
     user_response = UserResponse(
         id=current_user["_id"],
         name=current_user["name"],
