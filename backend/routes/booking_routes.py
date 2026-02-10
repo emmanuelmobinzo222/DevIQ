@@ -18,7 +18,6 @@ async def book_ride(
     user = Depends(get_current_user)
 ):
     from dependencies import get_current_user
-    user = await get_current_user(authorization)
     db = await get_db()
     
     # Get ride
