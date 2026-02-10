@@ -3,7 +3,6 @@ from typing import Optional
 from auth import decode_access_token
 
 async def get_db():
-    """Get database instance from server.py"""
     from server import db
     return db
 
@@ -33,8 +32,29 @@ async def get_current_user(authorization: Optional[str] = Header(None)):
     
     return user
 
-async def get_current_driver(authorization: Optional[str] = Header(None)):
-    user = await get_current_user(authorization)
-    if user.get("role") != "driver":
-        raise HTTPException(status_code=403, detail="Only drivers can access this resource")
-    return user
+def check_subscription_limits(user: dict, action: str):
+    tier = user.get('subscriptionTier', 'free')
+    
+    limits = {
+        'free': {'maxProjects': 3, 'aiCredits': 100},
+        'pro': {'maxProjects': -1, 'aiCredits': 5000},
+        'enterprise': {'maxProjects': -1, 'aiCredits': -1}
+    }
+    
+    tier_limits = limits.get(tier, limits['free'])
+    
+    if action == 'create_project':
+        if tier_limits['maxProjects'] != -1 and user.get('projectsCount', 0) >= tier_limits['maxProjects']:
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Project limit reached. Upgrade to Pro for unlimited projects."
+            )
+    
+    if action == 'use_ai':
+        if tier_limits['aiCredits'] != -1 and user.get('aiCredits', 0) <= 0:
+            raise HTTPException(
+                status_code=403,
+                detail="AI credits exhausted. Upgrade your plan for more credits."
+            )
+    
+    return True

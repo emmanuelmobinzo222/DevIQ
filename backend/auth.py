@@ -6,16 +6,14 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# SECRET_KEY from environment - if not set, generate a strong one
-SECRET_KEY = os.environ.get('SECRET_KEY', 'rideshare-production-secret-key-2025-change-this-immediately-' + str(os.urandom(32).hex()))
+SECRET_KEY = os.environ.get('SECRET_KEY', 'deviq-secret-key-' + str(os.urandom(32).hex()))
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 30  # 30 days
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
@@ -39,7 +37,3 @@ def decode_access_token(token: str):
         return payload
     except JWTError:
         return None
-
-def hash_card_number(card_number: str) -> str:
-    """Hash card number for secure storage (only last 4 digits visible)"""
-    return f"****-****-****-{card_number[-4:]}"

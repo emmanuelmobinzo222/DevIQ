@@ -1,61 +1,30 @@
-from pydantic import BaseModel, Field, EmailStr
-from typing import Optional, List
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional, List, Dict
 from datetime import datetime
-from bson import ObjectId
+from enum import Enum
 
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
+class SubscriptionTier(str, Enum):
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
 
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid objectid")
-        return ObjectId(v)
+class ProjectStatus(str, Enum):
+    DRAFT = "draft"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    EXPORTED = "exported"
 
-    @classmethod
-    def __get_pydantic_json_schema__(cls, field_schema):
-        field_schema.update(type="string")
+class AppPlatform(str, Enum):
+    IOS = "ios"
+    ANDROID = "android"
+    BOTH = "both"
 
 # User Models
-class Location(BaseModel):
-    lat: float
-    lng: float
-    country: str
-    city: Optional[str] = None
-    address: Optional[str] = None
-
-class BankAccount(BaseModel):
-    accountHolder: str
-    accountNumber: str
-    bankName: str
-    branchCode: str
-    accountType: str  # 'Savings' or 'Current'
-    swiftCode: Optional[str] = None
-
-class ChildProfile(BaseModel):
-    name: str
-    age: int
-    school: str
-    idNumber: str
-    photoUrl: str
-
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
-    phone: str
-    role: str  # 'rider', 'driver', or 'parent'
-    cardNumber: str
-    cardExpiry: str
-    cardCVV: str
-    idNumber: str  # National ID number
-    idPhotoUrl: Optional[str] = None  # Photo of ID
-    selfieWithIdUrl: Optional[str] = None  # Selfie holding ID
-    location: Optional[Location] = None
-    bankAccount: Optional[BankAccount] = None  # Required for drivers
-    children: Optional[List[ChildProfile]] = []
+    company: Optional[str] = None
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -65,101 +34,94 @@ class UserResponse(BaseModel):
     id: str
     name: str
     email: str
-    phone: str
-    role: str
-    rating: float
-    totalRides: int
-    verified: bool
-    cardVerified: bool
-    idVerified: bool
-    location: Optional[Location] = None
+    company: Optional[str] = None
+    subscriptionTier: SubscriptionTier
+    subscriptionStatus: str
+    projectsCount: int
+    maxProjects: int
+    aiCredits: int
+    createdAt: datetime
     avatar: str
-    carModel: Optional[str] = None
-    carPlate: Optional[str] = None
-    bankAccount: Optional[BankAccount] = None
-    children: Optional[List[ChildProfile]] = []
+
+# Subscription Models
+class SubscriptionCreate(BaseModel):
+    tier: SubscriptionTier
+    paymentMethod: str
+    billingCycle: str  # monthly, yearly
+
+class SubscriptionResponse(BaseModel):
+    id: str
+    userId: str
+    tier: SubscriptionTier
+    status: str
+    amount: float
+    currency: str
+    billingCycle: str
+    nextBillingDate: datetime
     createdAt: datetime
 
-class UserUpdate(BaseModel):
+# Project Models
+class ProjectCreate(BaseModel):
+    name: str
+    description: str
+    platform: AppPlatform
+    template: Optional[str] = None
+    appType: str  # e-commerce, social, productivity, etc.
+
+class ProjectUpdate(BaseModel):
     name: Optional[str] = None
-    phone: Optional[str] = None
-    carModel: Optional[str] = None
-    carPlate: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[ProjectStatus] = None
+    code: Optional[Dict] = None
 
-# Ride Models
-class RideLocation(BaseModel):
-    lat: float
-    lng: float
-    address: str
+class ProjectResponse(BaseModel):
+    id: str
+    userId: str
+    name: str
+    description: str
+    platform: AppPlatform
+    appType: str
+    status: ProjectStatus
+    code: Optional[Dict] = None
+    preview: Optional[str] = None
+    createdAt: datetime
+    updatedAt: datetime
 
-class RideCreate(BaseModel):
-    origin: RideLocation
-    destination: RideLocation
-    departureTime: str
-    rideType: str  # 'school_kids', 'private_1', 'shared_2', 'shared_3', 'shared_4', 'shared_5plus', 'split_cost'
-    availableSeats: int
-    totalSeats: int
-    pricePerSeat: float
-    currency: str  # 'ZAR', 'USD', 'EUR', etc.
-    carModel: str
-    carPlate: str
-    distance: Optional[str] = None
-    duration: Optional[str] = None
-    isSchoolRide: bool = False
-    schoolName: Optional[str] = None
+# AI Chat Models
+class ChatMessage(BaseModel):
+    role: str  # user, assistant, system
+    content: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
 
-class PassengerInfo(BaseModel):
+class ChatRequest(BaseModel):
+    projectId: str
+    message: str
+    context: Optional[Dict] = None
+
+class ChatResponse(BaseModel):
+    message: str
+    code: Optional[Dict] = None
+    suggestions: Optional[List[str]] = None
+
+# Template Models
+class TemplateResponse(BaseModel):
     id: str
     name: str
-    avatar: str
+    description: str
+    category: str
+    platform: AppPlatform
+    preview: str
+    tier: SubscriptionTier
+    features: List[str]
+    thumbnail: str
 
-class RideResponse(BaseModel):
-    id: str
-    driverId: str
-    driverName: str
-    driverRating: float
-    driverAvatar: str
-    carModel: str
-    carPlate: str
-    origin: RideLocation
-    destination: RideLocation
-    departureTime: str
-    rideType: str
-    availableSeats: int
-    totalSeats: int
-    pricePerSeat: float
-    currency: str
-    status: str
-    passengers: List[PassengerInfo]
-    distance: Optional[str] = None
-    duration: Optional[str] = None
-    splitEnabled: bool = True
-    isSchoolRide: bool = False
-    schoolName: Optional[str] = None
-    createdAt: datetime
+# Export Models
+class ExportRequest(BaseModel):
+    projectId: str
+    platform: AppPlatform
+    includeAssets: bool = True
 
-# Booking Models
-class BookingCreate(BaseModel):
-    seats: int
-    splitFare: bool
-
-class BookingResponse(BaseModel):
-    id: str
-    rideId: str
-    userId: str
-    seats: int
-    cost: float
-    splitFare: bool
-    status: str
-    createdAt: datetime
-
-class RideHistory(BaseModel):
-    id: str
-    date: str
-    origin: str
-    destination: str
-    fare: float
-    splitWith: int
-    finalCost: float
-    status: str
-    rating: Optional[int] = None
+class ExportResponse(BaseModel):
+    downloadUrl: str
+    expiresAt: datetime
+    fileSize: str
