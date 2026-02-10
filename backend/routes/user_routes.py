@@ -40,7 +40,7 @@ async def get_user(user_id: str):
 async def update_user(
     user_id: str,
     user_data: UserUpdate,
-    authorization: str = Depends(lambda: None)
+    current_user = Depends(get_current_user)
 ):
     from dependencies import get_current_user
     current_user = await get_current_user(authorization)
