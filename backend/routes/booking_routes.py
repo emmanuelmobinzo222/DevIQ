@@ -96,7 +96,7 @@ async def book_ride(
 @router.get("/users/{user_id}/history", response_model=List[RideHistory])
 async def get_user_history(
     user_id: str,
-    authorization: str = Depends(lambda: None)
+    current_user = Depends(get_current_user)
 ):
     from dependencies import get_current_user
     current_user = await get_current_user(authorization)
