@@ -20,11 +20,18 @@ const Auth = ({ mode = 'login' }) => {
     cardNumber: '',
     cardExpiry: '',
     cardCVV: '',
+    idNumber: '',
     idImage: null,
-    location: null
+    selfieWithId: null,
+    location: null,
+    bankAccount: null,
+    children: []
   });
   const [idImagePreview, setIdImagePreview] = useState(null);
+  const [selfiePreview, setSelfiePreview] = useState(null);
   const [locationDetected, setLocationDetected] = useState(false);
+  const [showBankForm, setShowBankForm] = useState(false);
+  const [showChildForm, setShowChildForm] = useState(false);
 
   useEffect(() => {
     // Detect user's location automatically
