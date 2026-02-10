@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from models import UserCreate, UserLogin, UserResponse
 from auth import get_password_hash, verify_password, create_access_token, hash_card_number
+from dependencies import get_current_user
 from datetime import datetime
 import uuid
 
