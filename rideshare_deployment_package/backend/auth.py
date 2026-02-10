@@ -3,10 +3,17 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from typing import Optional
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env')
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "your-secret-key-change-in-production-rideshare-2025")
+# SECRET_KEY from environment - if not set, generate a strong one
+SECRET_KEY = os.environ.get('SECRET_KEY', 'rideshare-production-secret-key-2025-change-this-immediately-' + str(os.urandom(32).hex()))
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 

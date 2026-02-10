@@ -105,21 +105,38 @@ async def get_user_history(
     if current_user["_id"] != user_id:
         raise HTTPException(status_code=403, detail="Not authorized to view this user's history")
     
-    # Get all bookings for user
-    bookings = await db.bookings.find({
-        "userId": user_id,
-        "status": "confirmed"
-    }).sort("createdAt", -1).to_list(length=100)
+    # Get all bookings for user with projection
+    bookings = await db.bookings.find(
+        {"userId": user_id, "status": "confirmed"},
+        {"_id": 1, "rideId": 1, "seats": 1, "cost": 1, "splitFare": 1, "rating": 1, "createdAt": 1}
+    ).sort("createdAt", -1).limit(100).to_list(length=None)
     
+    if not bookings:
+        return []
+    
+    # Batch fetch all rides
+    ride_ids = [booking["rideId"] for booking in bookings]
+    rides_cursor = db.rides.find(
+        {"_id": {"$in": ride_ids}},
+        {"_id": 1, "origin": 1, "destination": 1, "pricePerSeat": 1}
+    )
+    rides = await rides_cursor.to_list(length=None)
+    rides_dict = {ride["_id"]: ride for ride in rides}
+    
+    # Batch count bookings per ride using aggregation
+    booking_counts_pipeline = [
+        {"$match": {"rideId": {"$in": ride_ids}, "status": "confirmed"}},
+        {"$group": {"_id": "$rideId", "count": {"$sum": 1}}}
+    ]
+    booking_counts = await db.bookings.aggregate(booking_counts_pipeline).to_list(length=None)
+    booking_counts_dict = {item["_id"]: item["count"] for item in booking_counts}
+    
+    # Build history response
     history = []
     for booking in bookings:
-        ride = await db.rides.find_one({"_id": booking["rideId"]})
+        ride = rides_dict.get(booking["rideId"])
         if ride:
-            # Count how many people split the fare
-            total_bookings = await db.bookings.count_documents({
-                "rideId": booking["rideId"],
-                "status": "confirmed"
-            })
+            total_bookings = booking_counts_dict.get(booking["rideId"], 1)
             
             ride_history = RideHistory(
                 id=booking["_id"],
