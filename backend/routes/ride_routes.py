@@ -185,14 +185,18 @@ async def create_ride(
         origin=ride_data.origin,
         destination=ride_data.destination,
         departureTime=ride_data.departureTime,
+        rideType=ride_data.rideType,
         availableSeats=ride_data.availableSeats,
         totalSeats=ride_data.totalSeats,
         pricePerSeat=ride_data.pricePerSeat,
+        currency=ride_data.currency,
         status="available",
         passengers=[],
         distance=ride_doc["distance"],
         duration=ride_doc["duration"],
         splitEnabled=True,
+        isSchoolRide=ride_data.isSchoolRide,
+        schoolName=ride_data.schoolName,
         createdAt=ride_doc["createdAt"]
     )
     
