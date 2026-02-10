@@ -124,14 +124,18 @@ class RideResponse(BaseModel):
     origin: RideLocation
     destination: RideLocation
     departureTime: str
+    rideType: str
     availableSeats: int
     totalSeats: int
     pricePerSeat: float
+    currency: str
     status: str
     passengers: List[PassengerInfo]
     distance: Optional[str] = None
     duration: Optional[str] = None
     splitEnabled: bool = True
+    isSchoolRide: bool = False
+    schoolName: Optional[str] = None
     createdAt: datetime
 
 # Booking Models
