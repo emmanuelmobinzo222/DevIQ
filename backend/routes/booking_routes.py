@@ -15,7 +15,7 @@ async def get_db():
 async def book_ride(
     ride_id: str,
     booking_data: BookingCreate,
-    authorization: str = Depends(lambda: None)
+    user = Depends(get_current_user)
 ):
     from dependencies import get_current_user
     user = await get_current_user(authorization)
