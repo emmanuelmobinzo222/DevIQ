@@ -136,7 +136,6 @@ async def create_ride(
     driver = Depends(get_current_driver)
 ):
     from dependencies import get_current_driver
-    driver = await get_current_driver(authorization)
     db = await get_db()
     
     # Create ride document
