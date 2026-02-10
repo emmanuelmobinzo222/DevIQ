@@ -76,6 +76,8 @@ class UserResponse(BaseModel):
     avatar: str
     carModel: Optional[str] = None
     carPlate: Optional[str] = None
+    bankAccount: Optional[BankAccount] = None
+    children: Optional[List[ChildProfile]] = []
     createdAt: datetime
 
 class UserUpdate(BaseModel):
