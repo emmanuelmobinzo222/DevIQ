@@ -1,15 +1,16 @@
 from datetime import datetime
 from typing import Dict, List
 import uuid
+import os
 
-# Creator's bank account details
+# Creator's bank account details - loaded from environment variables
 CREATOR_ACCOUNT = {
-    "accountHolder": "Mwenge Emmanuel Mobinzo",
-    "accountNumber": "19195042437",
-    "bankName": "Discovery Bank",
-    "branchCode": "679000",
-    "swiftCode": "DISCZAJJXXX",
-    "accountType": "Savings Account"
+    "accountHolder": os.environ.get('CREATOR_ACCOUNT_HOLDER', 'Mwenge Emmanuel Mobinzo'),
+    "accountNumber": os.environ.get('CREATOR_ACCOUNT_NUMBER', '19195042437'),
+    "bankName": os.environ.get('CREATOR_BANK_NAME', 'Discovery Bank'),
+    "branchCode": os.environ.get('CREATOR_BRANCH_CODE', '679000'),
+    "swiftCode": os.environ.get('CREATOR_SWIFT_CODE', 'DISCZAJJXXX'),
+    "accountType": os.environ.get('CREATOR_ACCOUNT_TYPE', 'Savings Account')
 }
 
 COMMISSION_RATE = 0.40  # 40% to creator
