@@ -128,25 +128,46 @@ async def get_rides(
 @router.get("/{ride_id}", response_model=RideResponse)
 async def get_ride(ride_id: str):
     db = await get_db()
-    ride = await db.rides.find_one({"_id": ride_id})
+    
+    # Get ride with projection
+    projection = {
+        '_id': 1, 'driverId': 1, 'origin': 1, 'destination': 1,
+        'departureTime': 1, 'availableSeats': 1, 'totalSeats': 1,
+        'pricePerSeat': 1, 'carModel': 1, 'carPlate': 1, 'status': 1,
+        'currency': 1, 'distance': 1, 'duration': 1, 'rideType': 1,
+        'splitEnabled': 1, 'isSchoolRide': 1, 'schoolName': 1, 'createdAt': 1
+    }
+    
+    ride = await db.rides.find_one({"_id": ride_id}, projection)
     if not ride:
         raise HTTPException(status_code=404, detail="Ride not found")
     
-    driver = await db.users.find_one({"_id": ride["driverId"]})
+    # Get driver with projection
+    driver = await db.users.find_one(
+        {"_id": ride["driverId"]},
+        {"_id": 1, "name": 1, "rating": 1, "avatar": 1}
+    )
     if not driver:
         raise HTTPException(status_code=404, detail="Driver not found")
     
-    # Get passengers
-    bookings = await db.bookings.find({
-        "rideId": ride_id,
-        "status": "confirmed"
-    }).to_list(length=100)
+    # Get bookings with projection
+    bookings = await db.bookings.find(
+        {"rideId": ride_id, "status": "confirmed"},
+        {"_id": 1, "userId": 1}
+    ).to_list(length=100)
     
-    passengers = []
-    for booking in bookings:
-        passenger = await db.users.find_one({"_id": booking["userId"]})
-        if passenger:
-            passengers.append(PassengerInfo(
+    # Batch fetch all passengers
+    passengers_list = []
+    if bookings:
+        user_ids = [booking["userId"] for booking in bookings]
+        passengers_cursor = db.users.find(
+            {"_id": {"$in": user_ids}},
+            {"_id": 1, "name": 1, "avatar": 1}
+        )
+        passengers = await passengers_cursor.to_list(length=None)
+        
+        for passenger in passengers:
+            passengers_list.append(PassengerInfo(
                 id=passenger["_id"],
                 name=passenger["name"],
                 avatar=passenger["avatar"]
@@ -163,13 +184,13 @@ async def get_ride(ride_id: str):
         origin=ride["origin"],
         destination=ride["destination"],
         departureTime=ride["departureTime"],
-        rideType=ride.get("rideType", "shared_3"),
+        rideType=ride.get("rideType", "split_cost"),
         availableSeats=ride["availableSeats"],
         totalSeats=ride["totalSeats"],
         pricePerSeat=ride["pricePerSeat"],
         currency=ride.get("currency", "ZAR"),
         status=ride["status"],
-        passengers=passengers,
+        passengers=passengers_list,
         distance=ride.get("distance", "N/A"),
         duration=ride.get("duration", "N/A"),
         splitEnabled=ride.get("splitEnabled", True),
