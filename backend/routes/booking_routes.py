@@ -99,7 +99,6 @@ async def get_user_history(
     current_user = Depends(get_current_user)
 ):
     from dependencies import get_current_user
-    current_user = await get_current_user(authorization)
     db = await get_db()
     
     # Only allow users to see their own history
