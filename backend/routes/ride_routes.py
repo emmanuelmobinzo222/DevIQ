@@ -133,7 +133,7 @@ async def get_ride(ride_id: str):
 @router.post("", response_model=RideResponse)
 async def create_ride(
     ride_data: RideCreate,
-    authorization: str = Depends(lambda: None)
+    driver = Depends(get_current_driver)
 ):
     from dependencies import get_current_driver
     driver = await get_current_driver(authorization)
