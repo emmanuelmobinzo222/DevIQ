@@ -26,16 +26,36 @@ class Location(BaseModel):
     city: Optional[str] = None
     address: Optional[str] = None
 
+class BankAccount(BaseModel):
+    accountHolder: str
+    accountNumber: str
+    bankName: str
+    branchCode: str
+    accountType: str  # 'Savings' or 'Current'
+    swiftCode: Optional[str] = None
+
+class ChildProfile(BaseModel):
+    name: str
+    age: int
+    school: str
+    idNumber: str
+    photoUrl: str
+
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
     phone: str
-    role: str  # 'rider' or 'driver'
+    role: str  # 'rider', 'driver', or 'parent'
     cardNumber: str
     cardExpiry: str
     cardCVV: str
+    idNumber: str  # National ID number
+    idPhotoUrl: Optional[str] = None  # Photo of ID
+    selfieWithIdUrl: Optional[str] = None  # Selfie holding ID
     location: Optional[Location] = None
+    bankAccount: Optional[BankAccount] = None  # Required for drivers
+    children: Optional[List[ChildProfile]] = []
 
 class UserLogin(BaseModel):
     email: EmailStr
