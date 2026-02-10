@@ -121,14 +121,18 @@ async def get_ride(ride_id: str):
         origin=ride["origin"],
         destination=ride["destination"],
         departureTime=ride["departureTime"],
+        rideType=ride.get("rideType", "shared_3"),
         availableSeats=ride["availableSeats"],
         totalSeats=ride["totalSeats"],
         pricePerSeat=ride["pricePerSeat"],
+        currency=ride.get("currency", "ZAR"),
         status=ride["status"],
         passengers=passengers,
         distance=ride.get("distance", "N/A"),
         duration=ride.get("duration", "N/A"),
         splitEnabled=ride.get("splitEnabled", True),
+        isSchoolRide=ride.get("isSchoolRide", False),
+        schoolName=ride.get("schoolName"),
         createdAt=ride["createdAt"]
     )
     
